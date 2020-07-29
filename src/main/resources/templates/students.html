@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <title>Students</title>
+</head>
+<body>
+<div th:replace="navbar"></div>
+<div class="row justify-content-center">
+    <div class="card mt-2 w-75">
+        <div class="card-header">
+            Students List<span th:if="${marathon}" th:text="' of ' + ${marathon.title}"></span>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger" th:if="${error}" th:text="${error}">
+            </div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" class="text-center">Id</th>
+                    <th scope="col" class="text-center">First Name</th>
+                    <th scope="col" class="text-center">Last Name</th>
+                    <th scope="col" class="text-center">Email</th>
+                    <th th:colspan="${marathon} ? 3 : 2" class="text-center w-25">Functions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="student : ${students}">
+                    <td th:text="${student.id}" class="text-center"></td>
+                    <td th:text="${student.firstName}"></td>
+                    <td th:text="${student.lastName}"></td>
+                    <td th:text="${student.email}"></td>
+                    <td th:if="${marathon}" class="text-center">
+                        <a th:href="@{/students/{mid}/delete/{id}(id=${student.id},mid=${marathon.id})}" data-toggle="tooltip" data-placement="top" title="Remove from marathon"><i class="fa fa-times fa-lg"></i></a>
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{/students/edit/{id}(id=${student.id})}" data-toggle="tooltip" data-placement="top" title="Edit student"><i class="fa fa-edit fa-lg"></i></a>
+                    </td>
+                    <td class="text-center">
+                        <a th:href="@{/students/delete/{id}(id=${student.id})}" data-toggle="tooltip" data-placement="top" title="Delete student"><i class="fa fa-trash fa-lg"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${students.isEmpty()}">
+                    <td th:colspan="${marathon} ? 7 : 6" th:text="'List is empty!'" th:align="center"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    })
+</script>
+</body>
+</html>
