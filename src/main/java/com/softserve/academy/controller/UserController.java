@@ -1,5 +1,6 @@
 package com.softserve.academy.controller;
 
+import com.softserve.academy.dto.MarathonDto;
 import com.softserve.academy.dto.UserDto;
 import com.softserve.academy.exception.UserNotFoundException;
 import com.softserve.academy.model.User;
@@ -16,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.stream.Stream;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class UserController {
@@ -27,14 +32,14 @@ public class UserController {
 
     @GetMapping("/students")
     public String showAllUsersPage(Model model) {
-        model.addAttribute("students", userService.getAllByRole(User.Role.TRAINEE));
+        sortStudentsAndAddToModel(model, userService.getAllByRole(User.Role.TRAINEE).stream());
         return "students";
     }
 
     @GetMapping("/students/{id}")
     public String showMarathonUsersPage(@PathVariable("id") long id, Model model) {
         var marathon = marathonService.getMarathonById(id);
-        model.addAttribute("students", marathon.getUsers());
+        sortStudentsAndAddToModel(model, marathon.getUsers().stream());
         model.addAttribute("marathon", marathon);
         return "students";
     }
@@ -46,7 +51,7 @@ public class UserController {
             user.setRole(User.Role.TRAINEE);
             model.addAttribute("user", user);
         }
-        model.addAttribute("allMarathons", marathonService.getAll());
+        sortMarathonsAddAddToModel(model);
         return "studentEdit";
     }
 
@@ -60,7 +65,7 @@ public class UserController {
                 return "redirect:/students";
             }
         }
-        model.addAttribute("allMarathons", marathonService.getAll());
+        sortMarathonsAddAddToModel(model);
         return "studentEdit";
     }
 
@@ -86,5 +91,17 @@ public class UserController {
         }
         userService.createOrUpdateUser(user);
         return "redirect:/students";
+    }
+
+    private void sortMarathonsAddAddToModel(Model model) {
+        model.addAttribute("allMarathons", marathonService.getAll().stream()
+                .sorted(comparing(MarathonDto::getTitle))
+                .collect(toList()));
+    }
+
+    private void sortStudentsAndAddToModel(Model model, Stream<UserDto> userDtoStream) {
+        model.addAttribute("students", userDtoStream
+                .sorted(comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
+                .collect(toList()));
     }
 }
