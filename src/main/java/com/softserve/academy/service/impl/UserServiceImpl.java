@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Validation;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,7 +32,8 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAll() {
         return repository.findAll().stream()
                 .map(this::mapEntityToDto)
-                .collect(toList());
+                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllByRole(User.Role role) {
         return repository.findAllByRole(role).stream()
                 .map(this::mapEntityToDto)
-                .collect(toList());
+                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -90,7 +92,7 @@ public class UserServiceImpl implements UserService {
     private UserDto mapEntityToDtoFetchMarathons(User entity) {
         return new UserDto(entity.getId(), entity.getEmail(), entity.getFirstName(), entity.getLastName(), entity.getPassword(),
                 entity.getRole(),
-                entity.getMarathons().stream().map(m -> new MarathonDto(m.getId(), m.getTitle(), new HashSet<>())).collect(toSet())
+                entity.getMarathons().stream().map(m -> new MarathonDto(m.getId(), m.getTitle(), new ArrayList<>())).collect(Collectors.toSet())
         );
     }
 

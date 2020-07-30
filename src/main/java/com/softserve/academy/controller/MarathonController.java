@@ -28,7 +28,7 @@ public class MarathonController {
 
     @GetMapping()
     public String showAllMarathons(Model model) {
-        model.addAttribute("marathons", marathonDtoSorting(marathonService.getAll()));
+        model.addAttribute("marathons", marathonService.getAll());
         return "marathons";
     }
 
@@ -37,7 +37,7 @@ public class MarathonController {
         if (!model.containsAttribute("marathon")) {
             model.addAttribute("marathon", new MarathonDto());
         }
-        model.addAttribute("allStudents", userDtoSorting(userService.getAll()));
+        model.addAttribute("allStudents", userService.getAll());
         return "marathonEdit";
     }
 
@@ -65,7 +65,7 @@ public class MarathonController {
                 return "redirect:/marathons";
             }
         }
-        model.addAttribute("allStudents", userDtoSorting(userService.getAll()));
+        model.addAttribute("allStudents", userService.getAll());
         return "marathonEdit";
     }
 
@@ -73,17 +73,5 @@ public class MarathonController {
     public String deleteMarathonById(@PathVariable("id") long id) {
         marathonService.deleteMarathonById(id);
         return "redirect:/marathons";
-    }
-
-    private List<MarathonDto> marathonDtoSorting(List<MarathonDto> list) {
-        return list.stream()
-                .sorted(Comparator.comparing(MarathonDto::getTitle))
-                .collect(Collectors.toList());
-    }
-
-    private List<UserDto> userDtoSorting(List<UserDto> list) {
-        return list.stream()
-                .sorted(Comparator.comparing(UserDto::getLastName).thenComparing(UserDto::getFirstName))
-                .collect(Collectors.toList());
     }
 }

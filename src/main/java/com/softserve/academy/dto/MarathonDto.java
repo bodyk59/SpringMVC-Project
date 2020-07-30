@@ -3,9 +3,7 @@ package com.softserve.academy.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -17,7 +15,7 @@ public class MarathonDto {
     @NotEmpty(message = "Title is required!")
     private String title;
 
-    private Set<UserDto> users = new HashSet<>();
+    private List<UserDto> users = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

@@ -32,14 +32,14 @@ public class UserController {
 
     @GetMapping("/students")
     public String showAllUsersPage(Model model) {
-        sortStudentsAndAddToModel(model, userService.getAllByRole(User.Role.TRAINEE).stream());
+        model.addAttribute("students", userService.getAllByRole(User.Role.TRAINEE));
         return "students";
     }
 
     @GetMapping("/students/{id}")
     public String showMarathonUsersPage(@PathVariable("id") long id, Model model) {
         var marathon = marathonService.getMarathonById(id);
-        sortStudentsAndAddToModel(model, marathon.getUsers().stream());
+        model.addAttribute("students", marathon.getUsers());
         model.addAttribute("marathon", marathon);
         return "students";
     }
@@ -51,7 +51,7 @@ public class UserController {
             user.setRole(User.Role.TRAINEE);
             model.addAttribute("user", user);
         }
-        sortMarathonsAddAddToModel(model);
+        model.addAttribute("allMarathons", marathonService.getAll());
         return "studentEdit";
     }
 
@@ -65,7 +65,7 @@ public class UserController {
                 return "redirect:/students";
             }
         }
-        sortMarathonsAddAddToModel(model);
+        model.addAttribute("allMarathons", marathonService.getAll());
         return "studentEdit";
     }
 
@@ -91,17 +91,5 @@ public class UserController {
         }
         userService.createOrUpdateUser(user);
         return "redirect:/students";
-    }
-
-    private void sortMarathonsAddAddToModel(Model model) {
-        model.addAttribute("allMarathons", marathonService.getAll().stream()
-                .sorted(comparing(MarathonDto::getTitle))
-                .collect(toList()));
-    }
-
-    private void sortStudentsAndAddToModel(Model model, Stream<UserDto> userDtoStream) {
-        model.addAttribute("students", userDtoStream
-                .sorted(comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
-                .collect(toList()));
     }
 }

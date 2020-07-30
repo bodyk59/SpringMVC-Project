@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Validation;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class MarathonServiceImpl implements MarathonService {
         return marathonRepository.findAll()
                 .stream()
                 .map(this::mapModelToDto)
+                .sorted(Comparator.comparing(MarathonDto::getTitle))
                 .collect(Collectors.toList());
     }
 
@@ -73,9 +75,13 @@ public class MarathonServiceImpl implements MarathonService {
         MarathonDto marathonDto = new MarathonDto();
         marathonDto.setId(marathon.getId());
         marathonDto.setTitle(marathon.getTitle());
-        marathonDto.setUsers(marathon.getUsers().stream().map(u -> new UserDto(
-                u.getId(), u.getEmail(), u.getFirstName(), u.getLastName(), u.getPassword(), u.getRole(), new HashSet<>()
-        )).collect(Collectors.toSet()));
+        marathonDto.setUsers(marathon.getUsers().stream()
+                .map(u -> new UserDto(
+                        u.getId(), u.getEmail(), u.getFirstName(), u.getLastName(), u.getPassword(), u.getRole(), new HashSet<>()
+                ))
+                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
+                .collect(Collectors.toList())
+        );
         return marathonDto;
     }
 
