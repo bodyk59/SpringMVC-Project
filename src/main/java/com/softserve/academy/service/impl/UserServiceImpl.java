@@ -8,16 +8,18 @@ import com.softserve.academy.model.User;
 import com.softserve.academy.repository.MarathonRepository;
 import com.softserve.academy.repository.UserRepository;
 import com.softserve.academy.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Validation;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.by;
 
 @Service
 @Transactional
@@ -30,10 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return repository.findAll().stream()
+        return repository.findAll(by(ASC, "firstName").and(by(ASC, "lastName"))).stream()
                 .map(this::mapEntityToDto)
-                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -63,10 +64,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllByRole(User.Role role) {
-        return repository.findAllByRole(role).stream()
+        return repository.findAllByRoleOrderByFirstNameAscLastNameAsc(role).stream()
                 .map(this::mapEntityToDto)
-                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -90,26 +90,22 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDto mapEntityToDtoFetchMarathons(User entity) {
-        return new UserDto(entity.getId(), entity.getEmail(), entity.getFirstName(), entity.getLastName(), entity.getPassword(),
-                entity.getRole(),
-                entity.getMarathons().stream().map(m -> new MarathonDto(m.getId(), m.getTitle(), new ArrayList<>())).collect(Collectors.toSet())
+        var dto = new UserDto();
+        BeanUtils.copyProperties(entity, dto);
+        entity.getMarathons().forEach(
+                m -> dto.getMarathons().add(new MarathonDto(m.getId(), m.getTitle(), new ArrayList<>()))
         );
+        return dto;
     }
 
     private UserDto mapEntityToDto(User entity) {
-        return new UserDto(entity.getId(), entity.getEmail(), entity.getFirstName(), entity.getLastName(), entity.getPassword(),
-                entity.getRole(),
-                new HashSet<>()
-        );
+        var dto = new UserDto();
+        BeanUtils.copyProperties(entity, dto);
+        return dto;
     }
 
     private void mapDtoToEntity(UserDto dto, User entity) {
-        entity.setEmail(dto.getEmail());
-        entity.setFirstName(dto.getFirstName());
-        entity.setLastName(dto.getLastName());
-        entity.setEmail(dto.getEmail());
-        entity.setPassword(dto.getPassword());
-        entity.setRole(dto.getRole());
+        BeanUtils.copyProperties(dto, entity);
         entity.getMarathons().clear();
         dto.getMarathons().forEach(m -> {
             Marathon marathon = marathonRepository.getOne(m.getId());

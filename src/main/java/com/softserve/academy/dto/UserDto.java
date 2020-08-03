@@ -9,9 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -35,7 +33,7 @@ public class UserDto {
     @NotNull(message = "Role is required!")
     private User.Role role;
 
-    private Set<MarathonDto> marathons = new HashSet<>();
+    private List<MarathonDto> marathons = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

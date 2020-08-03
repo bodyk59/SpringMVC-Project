@@ -13,10 +13,13 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import javax.validation.Validation;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.by;
 
 @Transactional
 @Service
@@ -29,11 +32,10 @@ public class MarathonServiceImpl implements MarathonService {
 
     @Override
     public List<MarathonDto> getAll() {
-        return marathonRepository.findAll()
+        return marathonRepository.findAll(by(ASC, "title"))
                 .stream()
                 .map(this::mapModelToDto)
-                .sorted(Comparator.comparing(MarathonDto::getTitle))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -77,10 +79,10 @@ public class MarathonServiceImpl implements MarathonService {
         marathonDto.setTitle(marathon.getTitle());
         marathonDto.setUsers(marathon.getUsers().stream()
                 .map(u -> new UserDto(
-                        u.getId(), u.getEmail(), u.getFirstName(), u.getLastName(), u.getPassword(), u.getRole(), new HashSet<>()
+                        u.getId(), u.getEmail(), u.getFirstName(), u.getLastName(), u.getPassword(), u.getRole(), new ArrayList<>()
                 ))
-                .sorted(Comparator.comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
-                .collect(Collectors.toList())
+                .sorted(comparing(UserDto::getFirstName).thenComparing(UserDto::getLastName))
+                .collect(toList())
         );
         return marathonDto;
     }

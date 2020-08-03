@@ -5,9 +5,6 @@ import org.springframework.format.Formatter;
 
 import java.util.Locale;
 
-/**
- * @author Bogdan Kurchak
- */
 public class UserDtoFormatter implements Formatter<UserDto> {
     @Override
     public UserDto parse(String id, Locale locale) {

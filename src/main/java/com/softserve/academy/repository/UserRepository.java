@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findAllByRole(User.Role role);
+    List<User> findAllByRoleOrderByFirstNameAscLastNameAsc(User.Role role);
 }
