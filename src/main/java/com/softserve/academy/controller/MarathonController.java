@@ -1,8 +1,6 @@
 package com.softserve.academy.controller;
 
 import com.softserve.academy.dto.MarathonDto;
-import com.softserve.academy.exception.MarathonInnerException;
-import com.softserve.academy.exception.MarathonNotFoundException;
 import com.softserve.academy.service.MarathonService;
 import com.softserve.academy.service.UserService;
 import org.slf4j.Logger;
