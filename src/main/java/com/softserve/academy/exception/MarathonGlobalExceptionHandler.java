@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,35 +16,39 @@ public class MarathonGlobalExceptionHandler {
     private static final Logger MARATHON_EXCEPTIONS_HANDLER_LOGGER =
             LoggerFactory.getLogger(MarathonGlobalExceptionHandler.class);
 
-    private ModelAndView modelAndViewCreator(String exceptionMessage, int code) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("exceptionMessage", exceptionMessage);
-        modelAndView.addObject("code", code);
-        modelAndView.setViewName("error");
-        return modelAndView;
-    }
-
     @ExceptionHandler({MarathonInnerException.class})
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ModelAndView innerExceptionsHandler(HttpServletRequest request, Exception exception) {
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Marathon Inner Exception occurred")
+    public void entityNotFoundHandler(HttpServletRequest request, Exception exception) {
         MARATHON_EXCEPTIONS_HANDLER_LOGGER.error(
                 String.format("URL: %s | Status code: %d | Caused: %s",
                         request.getRequestURL(),
                         HttpStatus.NOT_FOUND.value(),
                         exception.getMessage())
         );
-        return modelAndViewCreator("Page not found! Please try again later.", HttpStatus.NOT_FOUND.value());
     }
 
-    @ExceptionHandler({Exception.class})
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView systemMarathonExceptionsHandler(HttpServletRequest request, Exception exception) {
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR,  reason = "Internal Server Exception occurred")
+    public void internalServerErrorHandler(HttpServletRequest request, Exception exception) {
         MARATHON_EXCEPTIONS_HANDLER_LOGGER.error(
                 String.format("URL: %s | Status code: %d | Caused: %s",
                         request.getRequestURL(),
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         exception.getMessage())
         );
-        return modelAndViewCreator("Something went wrong! Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ModelAndView badRequestHandler(HttpServletRequest request, Exception exception) {
+        MARATHON_EXCEPTIONS_HANDLER_LOGGER.error(
+                String.format("URL: %s | Status code: %d | Caused: %s",
+                        request.getRequestURL(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        exception.getMessage())
+        );
+
+        return new ModelAndView("error").addObject("message", exception.getMessage())
+                .addObject("code", HttpStatus.BAD_REQUEST.value());
     }
 }
