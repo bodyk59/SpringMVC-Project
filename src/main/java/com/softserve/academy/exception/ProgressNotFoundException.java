@@ -1,4 +1,4 @@
 package com.softserve.academy.exception;
 
-public class ProgressNotFoundException extends RuntimeException {
+public class ProgressNotFoundException extends MarathonInnerException {
 }
