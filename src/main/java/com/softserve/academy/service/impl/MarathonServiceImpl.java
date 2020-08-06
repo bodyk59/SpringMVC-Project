@@ -41,7 +41,7 @@ public class MarathonServiceImpl implements MarathonService {
     @Override
     public MarathonDto getMarathonById(Long id) {
         return mapModelToDto(marathonRepository.findById(id)
-                .orElseThrow(MarathonNotFoundException::new));
+                .orElseThrow(() -> new MarathonNotFoundException("Marathon with given id is not found!")));
     }
 
     @Override
@@ -61,13 +61,15 @@ public class MarathonServiceImpl implements MarathonService {
 
     @Override
     public void deleteMarathonById(Long id) {
-        var marathon = marathonRepository.findById(id).orElseThrow(MarathonNotFoundException::new);
+        var marathon = marathonRepository.findById(id)
+                .orElseThrow(() -> new MarathonNotFoundException("Marathon with given id is not found!"));
         marathonRepository.delete(marathon);
     }
 
     @Override
     public void removeFromMarathon(Long userId, Long marathonId) {
-        var marathon = marathonRepository.findById(marathonId).orElseThrow(MarathonNotFoundException::new);
+        var marathon = marathonRepository
+                .findById(marathonId).orElseThrow(() -> new MarathonNotFoundException("Marathon with given id is not found!"));
         marathon.getUsers().removeIf(u -> u.getId() == userId);
         userRepository.getOne(userId).getMarathons().remove(marathon);
         marathonRepository.save(marathon);

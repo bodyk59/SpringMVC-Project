@@ -44,7 +44,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByIdFetchMarathons(Long id) {
-        return mapEntityToDtoFetchMarathons(repository.findById(id).orElseThrow(UserNotFoundException::new));
+        return mapEntityToDtoFetchMarathons(repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with given id is not found!")));
     }
 
     @Override
@@ -86,7 +87,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void userDelete(Long id) {
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (Exception e) {
+            throw new UserNotFoundException("User with given id is not found!");
+        }
+
     }
 
     private UserDto mapEntityToDtoFetchMarathons(User entity) {

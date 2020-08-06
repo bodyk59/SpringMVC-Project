@@ -55,26 +55,17 @@ public class UserController {
     }
 
     @GetMapping("/students/edit/{id}")
-    public String showEditUserPage(@PathVariable long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditUserPage(@PathVariable long id, Model model) {
         if (!model.containsAttribute("user")) {
-            try {
-                model.addAttribute("user", userService.getUserByIdFetchMarathons(id));
-            } catch (UserNotFoundException e) {
-                redirectAttributes.addFlashAttribute("error", "User with given id not found!");
-                return "redirect:/students";
-            }
+            model.addAttribute("user", userService.getUserByIdFetchMarathons(id));
         }
         model.addAttribute("allMarathons", marathonService.getAll());
         return "studentEdit";
     }
 
     @GetMapping("/students/delete/{id}")
-    public String deleteUserById(@PathVariable long id, RedirectAttributes redirectAttributes) {
-        try {
-            userService.userDelete(id);
-        } catch (EmptyResultDataAccessException e) {
-            redirectAttributes.addFlashAttribute("error", "No user with id " + id + " exists!");
-        }
+    public String deleteUserById(@PathVariable long id) {
+        userService.userDelete(id);
         return "redirect:/students";
     }
 

@@ -1,7 +1,6 @@
 package com.softserve.academy.controller;
 
 import com.softserve.academy.dto.MarathonDto;
-import com.softserve.academy.exception.MarathonNotFoundException;
 import com.softserve.academy.service.MarathonService;
 import com.softserve.academy.service.UserService;
 import org.slf4j.Logger;
@@ -60,30 +59,19 @@ public class MarathonController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCurrentMarathon(@PathVariable long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editCurrentMarathon(@PathVariable long id, Model model) {
         logger.info("Edit current marathon was called!");
         if (!model.containsAttribute("marathon")) {
-            try {
-                model.addAttribute("marathon", marathonService.getMarathonById(id));
-            } catch (MarathonNotFoundException e) {
-                redirectAttributes.addFlashAttribute("error", "Marathon with given id doesn`t exist!");
-                logger.error("Marathon with given id doesn`t exist, redirection to another page.");
-                return "redirect:/marathons";
-            }
+            model.addAttribute("marathon", marathonService.getMarathonById(id));
         }
         model.addAttribute("allStudents", userService.getAll());
         return "marathonEdit";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteMarathonById(@PathVariable long id, RedirectAttributes redirectAttributes) {
+    public String deleteMarathonById(@PathVariable long id) {
         logger.info("Delete marathon by id was called!");
-        try {
-            marathonService.deleteMarathonById(id);
-        } catch (MarathonNotFoundException e) {
-            logger.error("Marathon with given id doesn`t exist, redirection to another page.");
-            redirectAttributes.addFlashAttribute("error", String.format("No marathon with %d exists!", id));
-        }
+        marathonService.deleteMarathonById(id);
         return "redirect:/marathons";
     }
 }
